@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wingo Markets Positioning Analysis Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    /* Design System Variables */
+    :root {
+      --color-white: rgba(255, 255, 255, 1);
+      --color-black: rgba(0, 0, 0, 1);
+      --color-cream-50: rgba(252, 252, 249, 1);
+      --color-cream-100: rgba(255, 255, 253, 1);
+      --color-gray-200: rgba(245, 245, 245, 1);
+      --color-gray-300: rgba(167, 169, 169, 1);
+      --color-gray-400: rgba(119, 124, 124, 1);
+      --color-slate-500: rgba(98, 108, 113, 1);
+      --color-brown-600: rgba(94, 82, 64, 1);
+      --color-charcoal-700: rgba(31, 33, 33, 1);
+      --color-charcoal-800: rgba(38, 40, 40, 1);
+      --color-slate-900: rgba(19, 52, 59, 1);
+      --color-teal-300: rgba(50, 184, 198, 1);
+      --color-teal-400: rgba(45, 166, 178, 1);
+      --color-teal-500: rgba(33, 128, 141, 1);
+      --color-teal-600: rgba(29, 116, 128, 1);
+      --color-teal-700: rgba(26, 104, 115, 1);
+      --color-teal-800: rgba(41, 150, 161, 1);
+      --color-red-400: rgba(255, 84, 89, 1);
+      --color-red-500: rgba(192, 21, 47, 1);
+      --color-orange-400: rgba(230, 129, 97, 1);
+      --color-orange-500: rgba(168, 75, 47, 1);
+      --color-brown-600-rgb: 94, 82, 64;
+      --color-teal-500-rgb: 33, 128, 141;
+      --color-slate-900-rgb: 19, 52, 59;
+      --color-slate-500-rgb: 98, 108, 113;
+      --color-red-500-rgb: 192, 21, 47;
+      --color-red-400-rgb: 255, 84, 89;
+      --color-orange-500-rgb: 168, 75, 47;
+      --color-orange-400-rgb: 230, 129, 97;
+      --color-bg-1: rgba(59, 130, 246, 0.08);
+      --color-bg-2: rgba(245, 158, 11, 0.08);
+      --color-bg-3: rgba(34, 197, 94, 0.08);
+      --color-bg-4: rgba(239, 68, 68, 0.08);
+      --color-bg-5: rgba(147, 51, 234, 0.08);
+      --color-bg-6: rgba(249, 115, 22, 0.08);
+      --color-bg-7: rgba(236, 72, 153, 0.08);
+      --color-bg-8: rgba(6, 182, 212, 0.08);
+      --color-background: var(--color-cream-50);
+      --color-surface: var(--color-cream-100);
+      --color-text: var(--color-slate-900);
+      --color-text-secondary: var(--color-slate-500);
+      --color-primary: var(--color-teal-500);
+      --color-primary-hover: var(--color-teal-600);
+      --color-primary-active: var(--color-teal-700);
+      --color-secondary: rgba(var(--color-brown-600-rgb), 0.12);
+      --color-secondary-hover: rgba(var(--color-brown-600-rgb), 0.2);
+      --color-secondary-active: rgba(var(--color-brown-600-rgb), 0.25);
+      --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+      --color-btn-primary-text: var(--color-cream-50);
+      --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+      --color-card-border-inner: rgba(var(--color-brown-600-rgb), 0.12);
+      --color-error: var(--color-red-500);
+      --color-success: var(--color-teal-500);
+      --color-warning: var(--color-orange-500);
+      --color-info: var(--color-slate-500);
+      --color-focus-ring: rgba(var(--color-teal-500-rgb), 0.4);
+      --focus-ring: 0 0 0 3px var(--color-focus-ring);
+      --focus-outline: 2px solid var(--color-primary);
+      --font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-size-xs: 11px;
+      --font-size-sm: 12px;
+      --font-size-base: 14px;
+      --font-size-md: 14px;
+      --font-size-lg: 16px;
+      --font-size-xl: 18px;
+      --font-size-2xl: 20px;
+      --font-size-3xl: 24px;
+      --font-size-4xl: 30px;
+      --font-weight-normal: 400;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 550;
+      --font-weight-bold: 600;
+      --line-height-tight: 1.2;
+      --line-height-normal: 1.5;
+      --space-4: 4px;
+      --space-6: 6px;
+      --space-8: 8px;
+      --space-12: 12px;
+      --space-16: 16px;
+      --space-20: 20px;
+      --space-24: 24px;
+      --space-32: 32px;
+      --radius-sm: 6px;
+      --radius-base: 8px;
+      --radius-md: 10px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+      --duration-fast: 150ms;
+      --duration-normal: 250ms;
+      --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+      
+      /* Custom colors for positioning */
+      --wingo-red: #EF4444;
+      --wingo-green: #00A96E;
+      --wingo-yellow: #FACC15;
+      --competitor-blue: #3B82F6;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-gray-400-rgb: 119, 124, 124;
+        --color-teal-300-rgb: 50, 184, 198;
+        --color-gray-300-rgb: 167, 169, 169;
+        --color-gray-200-rgb: 245, 245, 245;
+        --color-bg-1: rgba(29, 78, 216, 0.15);
+        --color-bg-2: rgba(180, 83, 9, 0.15);
+        --color-bg-3: rgba(21, 128, 61, 0.15);
+        --color-bg-4: rgba(185, 28, 28, 0.15);
+        --color-bg-5: rgba(107, 33, 168, 0.15);
+        --color-bg-6: rgba(194, 65, 12, 0.15);
+        --color-bg-7: rgba(190, 24, 93, 0.15);
+        --color-bg-8: rgba(8, 145, 178, 0.15);
+        --color-background: var(--color-charcoal-700);
+        --color-surface: var(--color-charcoal-800);
+        --color-text: var(--color-gray-200);
+        --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.7);
+        --color-primary: var(--color-teal-300);
+        --color-primary-hover: var(--color-teal-400);
+        --color-primary-active: var(--color-teal-800);
+        --color-secondary: rgba(var(--color-gray-400-rgb), 0.15);
+        --color-secondary-hover: rgba(var(--color-gray-400-rgb), 0.25);
+        --color-secondary-active: rgba(var(--color-gray-400-rgb), 0.3);
+        --color-border: rgba(var(--color-gray-400-rgb), 0.3);
+        --color-error: var(--color-red-400);
+        --color-success: var(--color-teal-300);
+        --color-warning: var(--color-orange-400);
+        --color-info: var(--color-gray-300);
+        --color-focus-ring: rgba(var(--color-teal-300-rgb), 0.4);
+        --color-btn-primary-text: var(--color-slate-900);
+        --color-card-border: rgba(var(--color-gray-400-rgb), 0.2);
+        --color-card-border-inner: rgba(var(--color-gray-400-rgb), 0.15);
+        --color-success-rgb: var(--color-teal-300-rgb);
+        --color-error-rgb: var(--color-red-400-rgb);
+        --color-warning-rgb: var(--color-orange-400-rgb);
+        --color-info-rgb: var(--color-gray-300-rgb);
+      }
+    }
+    
+    @font-face {
+      font-family: 'FKGroteskNeue';
+      src: url('https://r2cdn.perplexity.ai/fonts/FKGroteskNeue.woff2') format('woff2');
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: var(--font-family-base);
+      background-color: var(--color-background);
+      color: var(--color-text);
+      line-height: var(--line-height-normal);
+      font-size: var(--font-size-base);
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, var(--wingo-green) 0%, var(--color-teal-700) 100%);
+      color: white;
+      padding: var(--space-32);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .header h1 {
+      font-size: var(--font-size-4xl);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-8);
+    }
+    
+    .header p {
+      font-size: var(--font-size-lg);
+      opacity: 0.95;
+    }
+    
+    .status-banner {
+      background: var(--wingo-red);
+      color: white;
+      padding: var(--space-20);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-24);
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .status-item {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .status-label {
+      font-size: var(--font-size-sm);
+      opacity: 0.9;
+      margin-bottom: var(--space-4);
+    }
+    
+    .status-value {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+    }
+    
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: var(--space-32);
+    }
+    
+    .section {
+      margin-bottom: var(--space-32);
+    }
+    
+    .section-title {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+      margin-bottom: var(--space-20);
+    }
+    
+    .card {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      padding: var(--space-24);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--color-card-border);
+    }
+    
+    .maps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: var(--space-24);
+    }
+    
+    .map-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      padding: var(--space-24);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--color-card-border);
+      transition: transform var(--duration-normal) var(--ease-standard);
+      cursor: pointer;
+    }
+    
+    .map-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .map-title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+      margin-bottom: var(--space-12);
+    }
+    
+    .map-insight {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-16);
+      padding: var(--space-12);
+      background: var(--color-bg-3);
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--color-success);
+    }
+    
+    .chart-wrapper {
+      position: relative;
+      height: 400px;
+    }
+    
+    .controls {
+      display: flex;
+      gap: var(--space-16);
+      margin-bottom: var(--space-24);
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-8) var(--space-16);
+      border-radius: var(--radius-base);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-medium);
+      cursor: pointer;
+      transition: all var(--duration-normal) var(--ease-standard);
+      border: none;
+      background: var(--color-primary);
+      color: var(--color-btn-primary-text);
+    }
+    
+    .btn:hover {
+      background: var(--color-primary-hover);
+    }
+    
+    .btn-secondary {
+      background: var(--color-secondary);
+      color: var(--color-text);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--color-secondary-hover);
+    }
+    
+    .btn.active {
+      background: var(--wingo-green);
+      color: white;
+    }
+    
+    .legend {
+      display: flex;
+      gap: var(--space-16);
+      flex-wrap: wrap;
+      margin-top: var(--space-16);
+      padding: var(--space-12);
+      background: var(--color-secondary);
+      border-radius: var(--radius-base);
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-8);
+      font-size: var(--font-size-sm);
+    }
+    
+    .legend-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+    }
+    
+    .persona-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: var(--space-16);
+    }
+    
+    .persona-table th,
+    .persona-table td {
+      padding: var(--space-12);
+      text-align: left;
+      border-bottom: 1px solid var(--color-border);
+    }
+    
+    .persona-table th {
+      background: var(--color-secondary);
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-sm);
+    }
+    
+    .rank-badge {
+      display: inline-block;
+      padding: var(--space-4) var(--space-8);
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+    }
+    
+    .rank-good {
+      background: rgba(34, 197, 94, 0.2);
+      color: var(--color-success);
+    }
+    
+    .rank-medium {
+      background: rgba(250, 204, 21, 0.2);
+      color: var(--wingo-yellow);
+    }
+    
+    .rank-poor {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--wingo-red);
+    }
+    
+    .roadmap-timeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-24);
+    }
+    
+    .phase-card {
+      background: var(--color-surface);
+      border-left: 4px solid var(--wingo-green);
+      padding: var(--space-20);
+      border-radius: var(--radius-base);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .phase-title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+      margin-bottom: var(--space-8);
+    }
+    
+    .phase-goal {
+      font-size: var(--font-size-base);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-16);
+    }
+    
+    .initiative-list {
+      list-style: none;
+    }
+    
+    .initiative-item {
+      padding: var(--space-12);
+      margin-bottom: var(--space-8);
+      background: var(--color-bg-1);
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-sm);
+    }
+    
+    .initiative-name {
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+      margin-bottom: var(--space-4);
+    }
+    
+    .initiative-impact {
+      color: var(--color-success);
+      font-size: var(--font-size-xs);
+    }
+    
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--font-size-sm);
+    }
+    
+    .matrix-table th,
+    .matrix-table td {
+      padding: var(--space-8);
+      text-align: center;
+      border: 1px solid var(--color-border);
+    }
+    
+    .matrix-table th {
+      background: var(--color-secondary);
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-xs);
+    }
+    
+    .matrix-table td {
+      font-size: var(--font-size-xs);
+    }
+    
+    .insights-panel {
+      background: var(--color-bg-1);
+      padding: var(--space-20);
+      border-radius: var(--radius-lg);
+      border-left: 4px solid var(--color-primary);
+    }
+    
+    .insight-section {
+      margin-bottom: var(--space-20);
+    }
+    
+    .insight-title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+      margin-bottom: var(--space-12);
+    }
+    
+    .insight-list {
+      list-style: none;
+    }
+    
+    .insight-list li {
+      padding: var(--space-8) 0;
+      padding-left: var(--space-20);
+      position: relative;
+      font-size: var(--font-size-sm);
+      line-height: 1.6;
+    }
+    
+    .insight-list li:before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--color-primary);
+      font-weight: bold;
+      font-size: var(--font-size-lg);
+    }
+    
+    .gap-indicator {
+      color: var(--wingo-red);
+      font-weight: var(--font-weight-semibold);
+    }
+    
+    .opportunity-indicator {
+      color: var(--wingo-green);
+      font-weight: var(--font-weight-semibold);
+    }
+    
+    @media (max-width: 768px) {
+      .maps-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .roadmap-timeline {
+        grid-template-columns: 1fr;
+      }
+      
+      .status-banner {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="header">
+    <h1>Wingo Markets Positioning Analysis</h1>
+    <p>Strategic Multi-Dimensional Positioning Dashboard - 7 Map Analysis</p>
+  </div>
+  
+  <div class="status-banner">
+    <div class="status-item">
+      <div class="status-label">Current Position</div>
+      <div class="status-value">#8 of 11</div>
+    </div>
+    <div class="status-item">
+      <div class="status-label">Overall Score</div>
+      <div class="status-value">900.38 / 1000</div>
+    </div>
+    <div class="status-item">
+      <div class="status-label">Phase 1 Target (6mo)</div>
+      <div class="status-value">920-940 pts</div>
+    </div>
+    <div class="status-item">
+      <div class="status-label">Phase 3 Goal (36mo)</div>
+      <div class="status-value">970-980 pts</div>
+    </div>
+    <div class="status-item">
+      <div class="status-label">Critical Gaps</div>
+      <div class="status-value">4 Identified</div>
+    </div>
+  </div>
+  
+  <div class="container">
+    
+    <div class="controls">
+      <button class="btn active" onclick="toggleTargets('all')">Show All Phases</button>
+      <button class="btn btn-secondary" onclick="toggleTargets('phase1')">Phase 1 Only</button>
+      <button class="btn btn-secondary" onclick="toggleTargets('phase2')">Phase 2 Only</button>
+      <button class="btn btn-secondary" onclick="toggleTargets('phase3')">Phase 3 Only</button>
+      <button class="btn btn-secondary" onclick="toggleTargets('none')">Hide Targets</button>
+    </div>
+    
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #EF4444;"></div>
+        <span>Wingo Current Position</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #3B82F6;"></div>
+        <span>Competitors</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #FACC15; border: 2px dashed #000;"></div>
+        <span>Phase 1-2 Targets</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #00A96E; border: 2px dashed #000;"></div>
+        <span>Phase 3 Targets</span>
+      </div>
+    </div>
+    
+    <!-- Positioning Maps Section -->
+    <section class="section">
+      <h2 class="section-title">7 Strategic Positioning Maps</h2>
+      
+      <div class="maps-grid">
+        <!-- Map 1: Trust & Accessibility -->
+        <div class="map-card">
+          <h3 class="map-title">1. Trust &amp; Accessibility</h3>
+          <div class="map-insight">
+            <strong>GAP:</strong> -4.29 pts to FIBO | <strong>Action:</strong> CySEC regulation needed
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="map1"></canvas>
+          </div>
+        </div>
+        
+        <!-- Map 2: Cost vs Convenience -->
+        <div class="map-card">
+          <h3 class="map-title">2. Cost vs Convenience</h3>
+          <div class="map-insight">
+            <strong>CRITICAL GAP:</strong> -3.16 pts | <strong>Action:</strong> Add Rial on/off-ramp partnerships
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="map2"></canvas>
+          </div>
+        </div>
+        
+        <!-- Map 3: Localization & Support -->
+        <div class="map-card">
+          <h3 class="map-title">3. Localization &amp; Support Quality</h3>
+          <div class="map-insight">
+            <strong>GAP:</strong> -1.8 pts to Alpari | <strong>Opportunity:</strong> Premium 24/7 Persian support
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="map3"></canvas>
+          </div>
+        </div>
+        
+        <!-- Map 4: Performance & Reliability -->
+        <div class="map-card">
+          <h3 class="map-title">4. Performance &amp; Reliability</h3>
+          <div class="map-insight">
+            <strong>WHITE SPACE:</strong> (9.0, 9.0) - Best mobile + social integration opportunity
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="map4"></canvas>
+          </div>
+        </div>
+        
+        <!-- Map 5: Trading Depth & Leverage -->
+        <div class="map-card">
+          <h3 class="map-title">5. Trading Depth &amp; Leverage</h3>
+          <div class="map-insight">
+            <strong>STRENGTH:</strong> +0.96 pts ahead on instruments | Only 0.7 pts from optimal position
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="map5"></canvas>
+          </div>
+        </div>
+        
+        <!-- Map 6: Education & Enablement -->
+        <div class="map-card">
+          <h3 class="map-title">6. Education &amp; Enablement</h3>
+          <div class="map-insight">
+            <strong>GAP:</strong> -1.5 pts | <strong>Opportunity:</strong> Social Trading Academy + no-deposit bonus
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="map6"></canvas>
+          </div>
+        </div>
+        
+        <!-- Map 7: Innovation & Engagement -->
+        <div class="map-card">
+          <h3 class="map-title">7. Innovation &amp; Engagement ⭐ PRIME OPPORTUNITY</h3>
+          <div class="map-insight">
+            <strong>WINGO LEADS:</strong> +2.08 pts on social | <strong>WHITE SPACE:</strong> (8.5+, 9.0+) worth 10-15% market share
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="map7"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Persona Performance Section -->
+    <section class="section">
+      <h2 class="section-title">Persona Performance Heatmap</h2>
+      <div class="card">
+        <table class="persona-table">
+          <thead>
+            <tr>
+              <th>Broker</th>
+              <th>Young Professional<br>(41.5% market)</th>
+              <th>Experienced Investor<br>(15.6% market)</th>
+              <th>Novice Retail<br>(35% market)</th>
+              <th>Institutional<br>(7.9% market)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Wingo Markets</strong></td>
+              <td><span class="rank-badge rank-poor">#8</span> 901.4</td>
+              <td><span class="rank-badge rank-poor">#8</span> 877.7</td>
+              <td><span class="rank-badge rank-medium">#7</span> 923.35</td>
+              <td><span class="rank-badge rank-poor">#8</span> 838.1</td>
+            </tr>
+            <tr style="background: var(--color-bg-3);">
+              <td><strong>FIBO Group</strong></td>
+              <td><span class="rank-badge rank-good">#1</span> 991.1</td>
+              <td><span class="rank-badge rank-good">#2</span> 1013.1</td>
+              <td><span class="rank-badge rank-good">#2</span> 973.9</td>
+              <td><span class="rank-badge rank-good">#2</span> 1017.55</td>
+            </tr>
+            <tr style="background: var(--color-bg-3);">
+              <td><strong>Alpari</strong></td>
+              <td><span class="rank-badge rank-good">#2</span> 989.9</td>
+              <td><span class="rank-badge rank-good">#1</span> 1016.45</td>
+              <td><span class="rank-badge rank-good">#3</span> 955.1</td>
+              <td><span class="rank-badge rank-good">#1</span> 1025.4</td>
+            </tr>
+            <tr style="background: var(--color-bg-3);">
+              <td><strong>LiteFinance</strong></td>
+              <td><span class="rank-badge rank-good">#3</span> 971.1</td>
+              <td><span class="rank-badge rank-good">#3</span> 984.85</td>
+              <td><span class="rank-badge rank-good">#1</span> 982.15</td>
+              <td><span class="rank-badge rank-medium">#4</span> 936.3</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top: var(--space-16); font-size: var(--font-size-sm); color: var(--color-text-secondary);">
+          <strong>Key Insight:</strong> Wingo performs worst with high-value segments (Experienced, Institutional). Trust deficit prevents premium market capture.
+        </p>
+      </div>
+    </section>
+    
+    <!-- Growth Roadmap Section -->
+    <section class="section">
+      <h2 class="section-title">3-Phase Growth Path Roadmap</h2>
+      <div class="roadmap-timeline">
+        <!-- Phase 1 -->
+        <div class="phase-card" style="border-left-color: #EF4444;">
+          <div class="phase-title">Phase 1: CRISIS → CREDIBLE</div>
+          <div class="phase-goal">0-6 months | Target: #5-6 rank, 920-940 pts</div>
+          <ul class="initiative-list">
+            <li class="initiative-item">
+              <div class="initiative-name">Regulatory Upgrade</div>
+              <div>Apply for CySEC license</div>
+              <div class="initiative-impact">↗ Trust: 4.19 → 7.5 (+3.31 pts)</div>
+            </li>
+            <li class="initiative-item">
+              <div class="initiative-name">Rial Payment Rails</div>
+              <div>Partner with Iranian exchanges</div>
+              <div class="initiative-impact">↗ Convenience: 5.84 → 8.0 (+2.16 pts)</div>
+            </li>
+            <li class="initiative-item">
+              <div class="initiative-name">Withdrawal SLA</div>
+              <div>72-hour guarantee + arbitration</div>
+              <div class="initiative-impact">↗ Reliability: 7.14 → 8.0 (+0.86 pts)</div>
+            </li>
+          </ul>
+          <div style="margin-top: var(--space-16); padding: var(--space-12); background: var(--color-bg-4); border-radius: var(--radius-sm); font-size: var(--font-size-sm);">
+            <strong>Overall Target:</strong> 900 → 935 pts | 0-3% market share
+          </div>
+        </div>
+        
+        <!-- Phase 2 -->
+        <div class="phase-card" style="border-left-color: #FACC15;">
+          <div class="phase-title">Phase 2: CREDIBLE → COMPETITIVE</div>
+          <div class="phase-goal">6-18 months | Target: #3-4 rank, 950-960 pts</div>
+          <ul class="initiative-list">
+            <li class="initiative-item">
+              <div class="initiative-name">cTrader + TradingView</div>
+              <div>Add advanced charting platforms</div>
+              <div class="initiative-impact">↗ Charting: 6.94 → 8.5 (+1.56 pts)</div>
+            </li>
+            <li class="initiative-item">
+              <div class="initiative-name">Social Trading 2.0</div>
+              <div>1000+ providers + AI matching</div>
+              <div class="initiative-impact">↗ Defend 9.02 lead</div>
+            </li>
+            <li class="initiative-item">
+              <div class="initiative-name">Mobile App 2.0</div>
+              <div>Proprietary social UI</div>
+              <div class="initiative-impact">↗ Mobile: 7.56 → 8.8 (+1.24 pts)</div>
+            </li>
+            <li class="initiative-item">
+              <div class="initiative-name">Persian Education Academy</div>
+              <div>100+ videos + certifications</div>
+              <div class="initiative-impact">↗ Education: 7.02 → 8.5 (+1.48 pts)</div>
+            </li>
+          </ul>
+          <div style="margin-top: var(--space-16); padding: var(--space-12); background: var(--color-bg-2); border-radius: var(--radius-sm); font-size: var(--font-size-sm);">
+            <strong>White Space Capture:</strong> Innovation (8.5, 9.0+) | 8-10% market share
+          </div>
+        </div>
+        
+        <!-- Phase 3 -->
+        <div class="phase-card" style="border-left-color: #00A96E;">
+          <div class="phase-title">Phase 3: COMPETITIVE → LEADER</div>
+          <div class="phase-goal">18-36 months | Target: #2-3 rank, 970-980 pts</div>
+          <ul class="initiative-list">
+            <li class="initiative-item">
+              <div class="initiative-name">Multi-Jurisdiction</div>
+              <div>Add BVI license + maintain CySEC</div>
+              <div class="initiative-impact">↗ Trust: 7.5 → 8.0+ (+0.5 pts)</div>
+            </li>
+            <li class="initiative-item">
+              <div class="initiative-name">Cent Accounts + Ultra Leverage</div>
+              <div>$1 minimum + 1:1000 leverage</div>
+              <div class="initiative-impact">↗ Depth: 7.94 → 9.0 (+1.06 pts)</div>
+            </li>
+            <li class="initiative-item">
+              <div class="initiative-name">Premium Support</div>
+              <div>24/7 dedicated managers + AI</div>
+              <div class="initiative-impact">↗ Support: 7.02 → 8.5 (+1.48 pts)</div>
+            </li>
+          </ul>
+          <div style="margin-top: var(--space-16); padding: var(--space-12); background: var(--color-bg-3); border-radius: var(--radius-sm); font-size: var(--font-size-sm);">
+            <strong>Market Leadership:</strong> 10-15% share | $150M+ annual revenue
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Competitive Matrix Section -->
+    <section class="section">
+      <h2 class="section-title">Competitive Positioning Matrix</h2>
+      <div class="card" style="overflow-x: auto;">
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Broker</th>
+              <th>Trust &amp;<br>Access</th>
+              <th>Cost &amp;<br>Conv.</th>
+              <th>Local. &amp;<br>Support</th>
+              <th>Perf. &amp;<br>Reliab.</th>
+              <th>Trading<br>Depth</th>
+              <th>Edu. &amp;<br>Enable</th>
+              <th>Innovation &amp;<br>Engage</th>
+              <th>Overall<br>Score</th>
+              <th>Rank</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background: var(--color-bg-3);">
+              <td><strong>FIBO Group</strong></td>
+              <td>1</td>
+              <td>4</td>
+              <td>2</td>
+              <td>1</td>
+              <td>3</td>
+              <td>2</td>
+              <td>4</td>
+              <td><strong>990.60</strong></td>
+              <td><strong>#1</strong></td>
+            </tr>
+            <tr style="background: var(--color-bg-3);">
+              <td><strong>Alpari</strong></td>
+              <td>3</td>
+              <td>3</td>
+              <td>1</td>
+              <td>1</td>
+              <td>2</td>
+              <td>1</td>
+              <td>5</td>
+              <td><strong>984.67</strong></td>
+              <td><strong>#2</strong></td>
+            </tr>
+            <tr style="background: rgba(239, 68, 68, 0.1);">
+              <td><strong>Wingo Markets</strong></td>
+              <td>8</td>
+              <td>8</td>
+              <td>4</td>
+              <td>4</td>
+              <td>1</td>
+              <td>5</td>
+              <td>1</td>
+              <td><strong>900.38</strong></td>
+              <td><strong>#8</strong></td>
+            </tr>
+            <tr>
+              <td>LiteFinance</td>
+              <td>5</td>
+              <td>2</td>
+              <td>3</td>
+              <td>3</td>
+              <td>1</td>
+              <td>1</td>
+              <td>3</td>
+              <td>958.45</td>
+              <td>#3</td>
+            </tr>
+            <tr>
+              <td>Errante</td>
+              <td>2</td>
+              <td>6</td>
+              <td>5</td>
+              <td>1</td>
+              <td>4</td>
+              <td>4</td>
+              <td>2</td>
+              <td>945.30</td>
+              <td>#4</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    
+    <!-- Strategic Insights Section -->
+    <section class="section">
+      <h2 class="section-title">Strategic Insights &amp; Key Takeaways</h2>
+      <div class="insights-panel">
+        
+        <div class="insight-section">
+          <h3 class="insight-title">✓ BIGGEST GAPS TO CLOSE</h3>
+          <ul class="insight-list">
+            <li><span class="gap-indicator">Regulation/Trust (4.19 → need 7.5+)</span> = -3.31 gap, Critical urgency - CySEC application required</li>
+            <li><span class="gap-indicator">Payment Rails (5.84 → need 8.0+)</span> = -2.16 gap, Blocks user acquisition - Rial partnerships with Nobitex/Wallex</li>
+            <li><span class="gap-indicator">Support Quality (7.02 → need 8.5+)</span> = -1.48 gap, Retention risk - Premium 24/7 Persian support needed</li>
+            <li><span class="gap-indicator">Execution Performance (7.14 → need 8.0+)</span> = -0.86 gap, 72-hour withdrawal SLA + arbitration system</li>
+          </ul>
+        </div>
+        
+        <div class="insight-section">
+          <h3 class="insight-title">✓ BIGGEST OPPORTUNITIES</h3>
+          <ul class="insight-list">
+            <li><span class="opportunity-indicator">Innovation + Charting WHITE SPACE</span> at (8.5, 9.0+) = 10-15% market share potential - Add cTrader/TradingView to reach unoccupied territory</li>
+            <li><span class="opportunity-indicator">Mobile App Excellence</span> (9.0, 9.0) = Unbeatable vs competitors - Proprietary app with integrated social trading UI</li>
+            <li><span class="opportunity-indicator">Trading Depth Optimization</span> (8.94 → 9.0+) = Only 0.7 pts from perfection - Add cent accounts + 1:1000 leverage</li>
+            <li><span class="opportunity-indicator">Social Trading Leadership</span> +2.08 pts ahead - Defend and expand with 1000+ signal providers + AI matching</li>
+          </ul>
+        </div>
+        
+        <div class="insight-section">
+          <h3 class="insight-title">✓ MARKET FRAGMENTATION ANALYSIS</h3>
+          <ul class="insight-list">
+            <li>NO broker scores 8+ in multiple dimensions simultaneously - market is fragmented</li>
+            <li>Wingo is ONLY broker leading in social trading (9.02 score) - unique positioning strength</li>
+            <li>White space exists in: (Trust + Accessibility 9+), (Charting + Social 8.5+/9+), (Regulation + Support 8+)</li>
+            <li>Most competitors strong in 2-3 areas, weak in 4-5 areas - opportunity for comprehensive excellence</li>
+          </ul>
+        </div>
+        
+        <div class="insight-section">
+          <h3 class="insight-title">✓ PERSONA INSIGHTS</h3>
+          <ul class="insight-list">
+            <li><strong>Novices (35% market)</strong> prefer: Education + Simple UI + Social (Wingo strength area - rank #7)</li>
+            <li><strong>Professionals (23.5% market)</strong> prefer: Regulation + Performance + Depth (Wingo weakness - rank #8)</li>
+            <li><strong>Trust deficit prevents institutional capture</strong> (7.9% market = $240M+ opportunity at risk)</li>
+            <li>Phase 1 regulation upgrade will unlock experienced/institutional segments worth 23.5% of total market</li>
+          </ul>
+        </div>
+        
+      </div>
+    </section>
+    
+  </div>
+  
+  <script>
+    // Positioning data
+    const positioningData = {
+      map1: {
+        title: 'Trust & Accessibility',
+        xLabel: 'Platform Security & Regulation',
+        yLabel: 'Broker Accessibility',
+        brokers: [
+          { name: 'FIBO Group', x: 8.48, y: 8.5, isWingo: false },
+          { name: 'Errante', x: 8.94, y: 8.0, isWingo: false },
+          { name: 'Alpari', x: 6.98, y: 9.0, isWingo: false },
+          { name: 'IFC Markets', x: 6.98, y: 8.5, isWingo: false },
+          { name: 'LiteFinance', x: 6.48, y: 8.5, isWingo: false },
+          { name: 'xChief', x: 7.48, y: 8.5, isWingo: false },
+          { name: 'AMarkets', x: 5.56, y: 8.5, isWingo: false },
+          { name: 'Windsor', x: 5.16, y: 7.5, isWingo: false },
+          { name: 'CapitalXtend', x: 5.48, y: 5.0, isWingo: false },
+          { name: 'Opo Finance', x: 3.19, y: 7.5, isWingo: false }
+        ],
+        wingo: { current: { x: 4.19, y: 8.5 }, phase1: { x: 6.5, y: 8.5 }, phase3: { x: 8.0, y: 8.5 } }
+      },
+      map2: {
+        title: 'Cost vs Convenience',
+        xLabel: 'Competitive Pricing (Spreads)',
+        yLabel: 'Deposit/Withdrawal Convenience',
+        brokers: [
+          { name: 'AMarkets', x: 8.48, y: 9.0, isWingo: false },
+          { name: 'LiteFinance', x: 7.98, y: 8.5, isWingo: false },
+          { name: 'IFC Markets', x: 7.48, y: 8.5, isWingo: false },
+          { name: 'Alpari', x: 7.48, y: 7.44, isWingo: false },
+          { name: 'xChief', x: 7.98, y: 7.5, isWingo: false },
+          { name: 'FIBO', x: 7.6, y: 7.5, isWingo: false },
+          { name: 'Windsor', x: 6.48, y: 8.0, isWingo: false },
+          { name: 'Errante', x: 7.48, y: 6.98, isWingo: false },
+          { name: 'CapitalXtend', x: 7.98, y: 5.5, isWingo: false },
+          { name: 'Opo Finance', x: 7.34, y: 5.02, isWingo: false }
+        ],
+        wingo: { current: { x: 7.17, y: 5.84 }, phase1: { x: 7.17, y: 8.0 }, phase2: { x: 7.17, y: 8.5 } }
+      },
+      map3: {
+        title: 'Localization & Support Quality',
+        xLabel: 'Persian Localization',
+        yLabel: 'Support Responsiveness',
+        brokers: [
+          { name: 'Alpari', x: 9.46, y: 8.82, isWingo: false },
+          { name: 'FIBO', x: 9.34, y: 8.64, isWingo: false },
+          { name: 'IFC Markets', x: 9.02, y: 8.64, isWingo: false },
+          { name: 'LiteFinance', x: 8.52, y: 7.64, isWingo: false },
+          { name: 'AMarkets', x: 8.52, y: 7.14, isWingo: false },
+          { name: 'Errante', x: 7.02, y: 7.94, isWingo: false },
+          { name: 'Windsor', x: 8.02, y: 6.14, isWingo: false },
+          { name: 'xChief', x: 7.02, y: 7.14, isWingo: false },
+          { name: 'Opo Finance', x: 7.52, y: 6.02, isWingo: false },
+          { name: 'CapitalXtend', x: 2.0, y: 6.0, isWingo: false }
+        ],
+        wingo: { current: { x: 8.52, y: 7.02 }, phase3: { x: 8.52, y: 8.5 } }
+      },
+      map4: {
+        title: 'Performance & Reliability',
+        xLabel: 'Execution Performance',
+        yLabel: 'Mobile App Quality',
+        brokers: [
+          { name: 'Errante', x: 8.44, y: 8.68, isWingo: false },
+          { name: 'Alpari', x: 8.44, y: 8.06, isWingo: false },
+          { name: 'FIBO', x: 8.44, y: 8.06, isWingo: false },
+          { name: 'LiteFinance', x: 7.62, y: 8.17, isWingo: false },
+          { name: 'xChief', x: 7.62, y: 7.56, isWingo: false },
+          { name: 'IFC Markets', x: 7.94, y: 7.06, isWingo: false },
+          { name: 'AMarkets', x: 7.12, y: 7.06, isWingo: false },
+          { name: 'CapitalXtend', x: 7.12, y: 6.88, isWingo: false },
+          { name: 'Windsor', x: 6.62, y: 6.06, isWingo: false },
+          { name: 'Opo Finance', x: 6.14, y: 7.06, isWingo: false }
+        ],
+        wingo: { current: { x: 7.14, y: 7.56 }, phase2: { x: 8.0, y: 8.5 }, phase3: { x: 8.5, y: 9.0 } }
+      },
+      map5: {
+        title: 'Trading Depth & Leverage',
+        xLabel: 'Instrument Breadth',
+        yLabel: 'Leverage Flexibility',
+        brokers: [
+          { name: 'LiteFinance', x: 6.98, y: 9.64, isWingo: false },
+          { name: 'xChief', x: 6.98, y: 9.14, isWingo: false },
+          { name: 'CapitalXtend', x: 7.48, y: 9.36, isWingo: false },
+          { name: 'Alpari', x: 6.48, y: 8.94, isWingo: false },
+          { name: 'AMarkets', x: 7.48, y: 8.94, isWingo: false },
+          { name: 'FIBO', x: 6.48, y: 8.44, isWingo: false },
+          { name: 'IFC Markets', x: 8.48, y: 7.29, isWingo: false },
+          { name: 'Errante', x: 6.48, y: 7.48, isWingo: false },
+          { name: 'Windsor', x: 6.98, y: 6.94, isWingo: false },
+          { name: 'Opo Finance', x: 6.48, y: 7.52, isWingo: false }
+        ],
+        wingo: { current: { x: 8.94, y: 7.94 }, phase3: { x: 9.0, y: 9.0 } }
+      },
+      map6: {
+        title: 'Education & Enablement',
+        xLabel: 'Persian Education',
+        yLabel: 'Demo & Enablement',
+        brokers: [
+          { name: 'LiteFinance', x: 8.02, y: 9.17, isWingo: false },
+          { name: 'xChief', x: 6.52, y: 9.64, isWingo: false },
+          { name: 'Alpari', x: 8.52, y: 9.0, isWingo: false },
+          { name: 'FIBO', x: 8.52, y: 9.0, isWingo: false },
+          { name: 'IFC Markets', x: 8.52, y: 9.17, isWingo: false },
+          { name: 'AMarkets', x: 7.02, y: 8.5, isWingo: false },
+          { name: 'Errante', x: 6.14, y: 8.5, isWingo: false },
+          { name: 'Windsor', x: 6.52, y: 8.17, isWingo: false },
+          { name: 'Opo Finance', x: 6.52, y: 8.17, isWingo: false },
+          { name: 'CapitalXtend', x: 1.0, y: 8.0, isWingo: false }
+        ],
+        wingo: { current: { x: 7.02, y: 8.64 }, phase2: { x: 8.5, y: 9.0 }, phase3: { x: 8.5, y: 9.5 } }
+      },
+      map7: {
+        title: 'Innovation & Engagement',
+        xLabel: 'Charting & Analysis Tools',
+        yLabel: 'Social Trading Engagement',
+        brokers: [
+          { name: 'Errante', x: 8.44, y: 7.29, isWingo: false },
+          { name: 'FIBO', x: 7.94, y: 6.98, isWingo: false },
+          { name: 'LiteFinance', x: 7.94, y: 7.64, isWingo: false },
+          { name: 'Alpari', x: 7.44, y: 7.31, isWingo: false },
+          { name: 'AMarkets', x: 6.44, y: 7.56, isWingo: false },
+          { name: 'xChief', x: 6.94, y: 7.48, isWingo: false },
+          { name: 'Windsor', x: 5.94, y: 7.06, isWingo: false },
+          { name: 'Opo Finance', x: 6.32, y: 7.52, isWingo: false },
+          { name: 'IFC Markets', x: 6.94, y: 5.16, isWingo: false },
+          { name: 'CapitalXtend', x: 6.94, y: 4.04, isWingo: false }
+        ],
+        wingo: { current: { x: 6.94, y: 9.02 }, phase2: { x: 8.5, y: 9.0 }, phase3: { x: 8.5, y: 9.2 } }
+      }
+    };
+    
+    let charts = {};
+    let showTargets = 'all';
+    
+    function toggleTargets(mode) {
+      showTargets = mode;
+      // Update button states
+      document.querySelectorAll('.controls .btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.classList.add('btn-secondary');
+      });
+      event.target.classList.add('active');
+      event.target.classList.remove('btn-secondary');
+      
+      // Recreate all charts
+      createAllCharts();
+    }
+    
+    function createScatterChart(canvasId, mapData) {
+      const ctx = document.getElementById(canvasId).getContext('2d');
+      
+      // Destroy existing chart if it exists
+      if (charts[canvasId]) {
+        charts[canvasId].destroy();
+      }
+      
+      const datasets = [];
+      
+      // Competitor data
+      datasets.push({
+        label: 'Competitors',
+        data: mapData.brokers.map(b => ({ x: b.x, y: b.y, label: b.name })),
+        backgroundColor: '#3B82F6',
+        borderColor: '#3B82F6',
+        pointRadius: 6,
+        pointHoverRadius: 8
+      });
+      
+      // Wingo current position
+      datasets.push({
+        label: 'Wingo Current',
+        data: [{ x: mapData.wingo.current.x, y: mapData.wingo.current.y, label: 'Wingo Markets (Current)' }],
+        backgroundColor: '#EF4444',
+        borderColor: '#EF4444',
+        pointRadius: 10,
+        pointHoverRadius: 12,
+        pointStyle: 'circle'
+      });
+      
+      // Add targets based on showTargets mode
+      if (showTargets !== 'none') {
+        if (mapData.wingo.phase1 && (showTargets === 'all' || showTargets === 'phase1')) {
+          datasets.push({
+            label: 'Phase 1 Target',
+            data: [{ x: mapData.wingo.phase1.x, y: mapData.wingo.phase1.y, label: 'Wingo Phase 1 Target' }],
+            backgroundColor: 'rgba(250, 204, 21, 0.6)',
+            borderColor: '#FACC15',
+            borderWidth: 2,
+            borderDash: [5, 5],
+            pointRadius: 8,
+            pointHoverRadius: 10,
+            pointStyle: 'rectRot'
+          });
+        }
+        
+        if (mapData.wingo.phase2 && (showTargets === 'all' || showTargets === 'phase2')) {
+          datasets.push({
+            label: 'Phase 2 Target',
+            data: [{ x: mapData.wingo.phase2.x, y: mapData.wingo.phase2.y, label: 'Wingo Phase 2 Target' }],
+            backgroundColor: 'rgba(250, 204, 21, 0.6)',
+            borderColor: '#FACC15',
+            borderWidth: 2,
+            borderDash: [5, 5],
+            pointRadius: 8,
+            pointHoverRadius: 10,
+            pointStyle: 'rectRot'
+          });
+        }
+        
+        if (mapData.wingo.phase3 && (showTargets === 'all' || showTargets === 'phase3')) {
+          datasets.push({
+            label: 'Phase 3 Target',
+            data: [{ x: mapData.wingo.phase3.x, y: mapData.wingo.phase3.y, label: 'Wingo Phase 3 Target' }],
+            backgroundColor: 'rgba(0, 169, 110, 0.6)',
+            borderColor: '#00A96E',
+            borderWidth: 2,
+            borderDash: [5, 5],
+            pointRadius: 8,
+            pointHoverRadius: 10,
+            pointStyle: 'star'
+          });
+        }
+      }
+      
+      charts[canvasId] = new Chart(ctx, {
+        type: 'scatter',
+        data: { datasets: datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const point = context.raw;
+                  return [
+                    point.label || 'Point',
+                    `X: ${point.x.toFixed(2)}`,
+                    `Y: ${point.y.toFixed(2)}`
+                  ];
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: mapData.xLabel,
+                font: { size: 12, weight: 'bold' }
+              },
+              min: 0,
+              max: 10,
+              ticks: {
+                stepSize: 1
+              },
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: mapData.yLabel,
+                font: { size: 12, weight: 'bold' }
+              },
+              min: 0,
+              max: 10,
+              ticks: {
+                stepSize: 1
+              },
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    function createAllCharts() {
+      createScatterChart('map1', positioningData.map1);
+      createScatterChart('map2', positioningData.map2);
+      createScatterChart('map3', positioningData.map3);
+      createScatterChart('map4', positioningData.map4);
+      createScatterChart('map5', positioningData.map5);
+      createScatterChart('map6', positioningData.map6);
+      createScatterChart('map7', positioningData.map7);
+    }
+    
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', function() {
+      createAllCharts();
+    });
+  </script>
+  
+</body>
+</html>
