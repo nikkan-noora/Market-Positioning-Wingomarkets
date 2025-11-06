@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PerplexiGrid | Interactive Analytics Dashboard - Wingo Markets</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    :root {
+      --primary-green: #00A96E;
+      --dark-teal: #0D3C3F;
+      --bg-white: #FFFFFF;
+      --bg-light-gray: #F5F7FA;
+      --text-primary: #1B1B1B;
+      --text-secondary: #6B7280;
+      --accent-mint: #D1FAE5;
+      --success-green: #22C55E;
+      --warning-amber: #FACC15;
+      --error-red: #EF4444;
+      --border-gray: #E5E7EB;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-light-gray);
+      color: var(--text-primary);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+    
+    .dashboard-header {
+      background: var(--dark-teal);
+      color: white;
+      padding: 24px 32px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .dashboard-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .dashboard-header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    
+    .filters-bar {
+      background: white;
+      padding: 20px 32px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .filter-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .filter-group select {
+      padding: 8px 12px;
+      border: 1px solid var(--border-gray);
+      border-radius: 8px;
+      background: white;
+      font-size: 14px;
+      cursor: pointer;
+      min-width: 150px;
+    }
+    
+    .filter-group select:focus {
+      outline: 2px solid var(--primary-green);
+      border-color: var(--primary-green);
+    }
+    
+    .export-btn {
+      margin-left: auto;
+      padding: 10px 20px;
+      background: var(--primary-green);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .export-btn:hover {
+      background: #009260;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 32px 32px 32px;
+    }
+    
+    .section {
+      margin-bottom: 32px;
+    }
+    
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--dark-teal);
+      margin-bottom: 16px;
+    }
+    
+    .grid {
+      display: grid;
+      gap: 20px;
+    }
+    
+    .grid-2 {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+    
+    .grid-3 {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+    
+    .grid-4 {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    
+    .metric-card {
+      text-align: center;
+      cursor: pointer;
+    }
+    
+    .metric-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--primary-green);
+      margin-bottom: 8px;
+    }
+    
+    .metric-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    
+    .metric-change {
+      font-size: 14px;
+      margin-top: 8px;
+      font-weight: 600;
+    }
+    
+    .metric-change.positive {
+      color: var(--success-green);
+    }
+    
+    .metric-change.neutral {
+      color: var(--text-secondary);
+    }
+    
+    .persona-card {
+      position: relative;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+    
+    .persona-card.expanded {
+      border-color: var(--primary-green);
+    }
+    
+    .persona-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    
+    .persona-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--dark-teal);
+    }
+    
+    .persona-share {
+      background: var(--accent-mint);
+      color: var(--primary-green);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .persona-basic {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .persona-stat {
+      font-size: 12px;
+    }
+    
+    .persona-stat strong {
+      color: var(--dark-teal);
+      font-weight: 600;
+    }
+    
+    .persona-details {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    
+    .persona-card.expanded .persona-details {
+      max-height: 1000px;
+    }
+    
+    .persona-section {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-gray);
+    }
+    
+    .persona-section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--dark-teal);
+      margin-bottom: 8px;
+    }
+    
+    .persona-list {
+      list-style: none;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .persona-list li {
+      padding: 4px 0;
+      padding-left: 16px;
+      position: relative;
+    }
+    
+    .persona-list li:before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--primary-green);
+      font-weight: bold;
+    }
+    
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-top: 16px;
+    }
+    
+    .chart-card {
+      padding: 24px;
+    }
+    
+    .chart-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--dark-teal);
+      margin-bottom: 16px;
+    }
+    
+    .criteria-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .criteria-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .criteria-label {
+      flex: 1;
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+    
+    .criteria-bar {
+      flex: 0 0 200px;
+      height: 24px;
+      background: var(--bg-light-gray);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .criteria-fill {
+      height: 100%;
+      border-radius: 12px;
+      transition: width 0.5s ease;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 8px;
+    }
+    
+    .criteria-score {
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+    }
+    
+    .criteria-fill.critical {
+      background: var(--error-red);
+    }
+    
+    .criteria-fill.high {
+      background: var(--warning-amber);
+    }
+    
+    .criteria-fill.medium {
+      background: var(--success-green);
+    }
+    
+    .criteria-fill.low {
+      background: var(--primary-green);
+    }
+    
+    .challenges-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    
+    @media (max-width: 768px) {
+      .challenges-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .challenge-item,
+    .opportunity-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--bg-light-gray);
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .challenge-item span:first-child,
+    .opportunity-item span:first-child {
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+    
+    .severity-badge,
+    .gap-badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .severity-critical,
+    .gap-critical {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--error-red);
+    }
+    
+    .severity-high,
+    .gap-high {
+      background: rgba(250, 204, 21, 0.2);
+      color: #D97706;
+    }
+    
+    .severity-medium,
+    .gap-medium {
+      background: rgba(34, 197, 94, 0.2);
+      color: var(--success-green);
+    }
+    
+    .kpi-timeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    
+    .kpi-milestone {
+      background: linear-gradient(135deg, var(--primary-green) 0%, #00D68F 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    
+    .kpi-month {
+      font-size: 12px;
+      font-weight: 600;
+      opacity: 0.9;
+      margin-bottom: 12px;
+    }
+    
+    .kpi-metrics {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .kpi-metric {
+      font-size: 11px;
+      opacity: 0.95;
+    }
+    
+    .kpi-metric strong {
+      font-size: 16px;
+      display: block;
+      margin-bottom: 2px;
+    }
+    
+    .roadmap-timeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    
+    .roadmap-phase {
+      background: white;
+      border-left: 4px solid var(--primary-green);
+      padding: 20px;
+      border-radius: 8px;
+    }
+    
+    .roadmap-phase h4 {
+      color: var(--dark-teal);
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    
+    .roadmap-phase ul {
+      list-style: none;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .roadmap-phase ul li {
+      padding: 6px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+    
+    .roadmap-phase ul li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--success-green);
+      font-weight: bold;
+    }
+    
+    .legend {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 16px;
+      font-size: 12px;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+    
+    .tooltip {
+      position: absolute;
+      background: rgba(0,0,0,0.9);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 1000;
+      max-width: 250px;
+    }
+    
+    .two-column-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    
+    @media (max-width: 992px) {
+      .two-column-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .expand-indicator {
+      font-size: 12px;
+      color: var(--primary-green);
+      text-align: center;
+      margin-top: 12px;
+      font-weight: 600;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="dashboard-header">
+    <h1>PerplexiGrid | Interactive Analytics Dashboard</h1>
+    <p>Iran Online Brokerage Market Analysis - Wingo Markets Strategic Insights</p>
+  </div>
+  
+  <div class="filters-bar">
+    <div class="filter-group">
+      <label>Date Range</label>
+      <select id="dateFilter">
+        <option value="3m">Last 3 Months</option>
+        <option value="6m" selected>Last 6 Months</option>
+        <option value="1y">Last Year</option>
+        <option value="custom">Custom Range</option>
+      </select>
+    </div>
+    
+    <div class="filter-group">
+      <label>Persona Filter</label>
+      <select id="personaFilter">
+        <option value="all" selected>All Personas</option>
+        <option value="1">Young Professional Trader</option>
+        <option value="2">Experienced Investor</option>
+        <option value="3">Novice Retail Investor</option>
+        <option value="4">Institutional/Semi-Pro</option>
+      </select>
+    </div>
+    
+    <div class="filter-group">
+      <label>View Mode</label>
+      <select id="viewMode">
+        <option value="detailed" selected>Detailed View</option>
+        <option value="summary">Summary View</option>
+      </select>
+    </div>
+    
+    <button class="export-btn" onclick="exportDashboard()">📊 Export Report</button>
+  </div>
+  
+  <div class="container">
+    
+    <!-- Market Overview Section -->
+    <section class="section">
+      <h2 class="section-title">Market Overview</h2>
+      <div class="grid grid-4">
+        <div class="card metric-card">
+          <div class="metric-value">$3.02B</div>
+          <div class="metric-label">Market Size 2025</div>
+          <div class="metric-change positive">↗ Growing to $6.61B by 2030</div>
+        </div>
+        <div class="card metric-card">
+          <div class="metric-value">16.95%</div>
+          <div class="metric-label">CAGR (2025-2030)</div>
+          <div class="metric-change positive">↗ Strong Growth Rate</div>
+        </div>
+        <div class="card metric-card">
+          <div class="metric-value">83M</div>
+          <div class="metric-label">Iran Population</div>
+          <div class="metric-change neutral">50M Internet Users</div>
+        </div>
+        <div class="card metric-card">
+          <div class="metric-value">85%</div>
+          <div class="metric-label">Smartphone Penetration</div>
+          <div class="metric-change positive">↗ Mobile-First Market</div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- User Personas Section -->
+    <section class="section">
+      <h2 class="section-title">Target User Personas</h2>
+      <div class="grid grid-4" id="personasGrid">
+        <!-- Personas will be dynamically generated -->
+      </div>
+    </section>
+    
+    <!-- Trading Behavior Section -->
+    <section class="section">
+      <h2 class="section-title">Trading Behavior Insights</h2>
+      <div class="two-column-grid">
+        <div class="card chart-card">
+          <h3>Behavior Influence Factors</h3>
+          <div class="chart-container">
+            <canvas id="influenceChart"></canvas>
+          </div>
+        </div>
+        <div class="card chart-card">
+          <h3>Portfolio Distribution</h3>
+          <div class="chart-container">
+            <canvas id="portfolioChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="two-column-grid" style="margin-top: 20px;">
+        <div class="card chart-card">
+          <h3>Investment Holding Periods</h3>
+          <div class="chart-container">
+            <canvas id="holdingChart"></canvas>
+          </div>
+        </div>
+        <div class="card chart-card">
+          <h3>Investor Type Split by Trading Value</h3>
+          <div class="chart-container">
+            <canvas id="investorTypeChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Market Preferences Section -->
+    <section class="section">
+      <h2 class="section-title">Trading Instruments Preference</h2>
+      <div class="two-column-grid">
+        <div class="card chart-card">
+          <h3>Instrument Distribution</h3>
+          <div class="chart-container">
+            <canvas id="instrumentsChart"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="font-size: 16px; font-weight: 600; color: var(--dark-teal); margin-bottom: 16px;">Key Insights</h3>
+          <div style="font-size: 13px; line-height: 1.8; color: var(--text-secondary);">
+            <p style="margin-bottom: 12px;"><strong style="color: var(--dark-teal);">Stocks/Equities</strong> dominate with <strong>45%</strong> market share, indicating strong traditional investment preference.</p>
+            <p style="margin-bottom: 12px;"><strong style="color: var(--dark-teal);">Forex Trading</strong> holds <strong>25%</strong> share, showing significant interest in currency markets.</p>
+            <p style="margin-bottom: 12px;"><strong style="color: var(--dark-teal);">Cryptocurrencies</strong> at <strong>15%</strong> demonstrate growing digital asset adoption.</p>
+            <p style="margin-bottom: 12px;"><strong style="color: var(--dark-teal);">Multi-Asset Approach:</strong> Investors prefer platforms offering diverse instruments for portfolio diversification.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Decision Criteria Section -->
+    <section class="section">
+      <h2 class="section-title">Key Decision Criteria (Importance Ratings)</h2>
+      <div class="card">
+        <div class="criteria-list" id="criteriaList">
+          <!-- Criteria will be dynamically generated -->
+        </div>
+        <div class="legend" style="margin-top: 24px;">
+          <div class="legend-item">
+            <div class="legend-color" style="background: var(--error-red);"></div>
+            <span>Critical (9.5-10)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: var(--warning-amber);"></div>
+            <span>High (8.5-9.4)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: var(--success-green);"></div>
+            <span>Medium (8.0-8.4)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: var(--primary-green);"></div>
+            <span>Low (&lt;8.0)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Challenges vs Opportunities Section -->
+    <section class="section">
+      <h2 class="section-title">Market Challenges &amp; Opportunities</h2>
+      <div class="challenges-grid">
+        <div class="card">
+          <h3 style="font-size: 16px; font-weight: 600; color: var(--dark-teal); margin-bottom: 16px;">Market Challenges</h3>
+          <div id="challengesList">
+            <!-- Challenges will be dynamically generated -->
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="font-size: 16px; font-weight: 600; color: var(--dark-teal); margin-bottom: 16px;">Market Opportunities</h3>
+          <div id="opportunitiesList">
+            <!-- Opportunities will be dynamically generated -->
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Fintech Growth Section -->
+    <section class="section">
+      <h2 class="section-title">Iran Fintech Market Growth Projection</h2>
+      <div class="card chart-card">
+        <h3>Market Size Forecast (2024-2033) - CAGR: 15.82%</h3>
+        <div class="chart-container" style="height: 350px;">
+          <canvas id="fintechGrowthChart"></canvas>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Strategic KPIs Section -->
+    <section class="section">
+      <h2 class="section-title">Strategic KPIs &amp; Year 1 Targets</h2>
+      <div class="kpi-timeline" id="kpiTimeline">
+        <!-- KPI milestones will be dynamically generated -->
+      </div>
+      <div class="grid grid-4" style="margin-top: 20px;">
+        <div class="card metric-card">
+          <div class="metric-value" style="font-size: 24px;">&gt;50</div>
+          <div class="metric-label">NPS Score Target</div>
+        </div>
+        <div class="card metric-card">
+          <div class="metric-value" style="font-size: 24px;">&gt;70%</div>
+          <div class="metric-label">30-Day Retention Rate</div>
+        </div>
+        <div class="card metric-card">
+          <div class="metric-value" style="font-size: 24px;">&lt;$50</div>
+          <div class="metric-label">Cost Per Acquisition</div>
+        </div>
+        <div class="card metric-card">
+          <div class="metric-value" style="font-size: 24px;">&gt;5:1</div>
+          <div class="metric-label">LTV:CAC Ratio</div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Marketing Strategy Section -->
+    <section class="section">
+      <h2 class="section-title">Marketing Channel Strategy</h2>
+      <div class="two-column-grid">
+        <div class="card chart-card">
+          <h3>Budget Allocation by Channel</h3>
+          <div class="chart-container">
+            <canvas id="marketingChart"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="font-size: 16px; font-weight: 600; color: var(--dark-teal); margin-bottom: 16px;">Channel Targets (Month 6)</h3>
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="challenge-item">
+              <span>Telegram Members</span>
+              <span style="font-weight: 700; color: var(--primary-green);">50,000</span>
+            </div>
+            <div class="challenge-item">
+              <span>Instagram Followers</span>
+              <span style="font-weight: 700; color: var(--primary-green);">25,000</span>
+            </div>
+            <div class="challenge-item">
+              <span>YouTube Subscribers</span>
+              <span style="font-weight: 700; color: var(--primary-green);">10,000</span>
+            </div>
+            <div class="challenge-item">
+              <span>Website Monthly Impressions</span>
+              <span style="font-weight: 700; color: var(--primary-green);">500,000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Customer Acquisition Funnel Section -->
+    <section class="section">
+      <h2 class="section-title">Customer Acquisition Funnel</h2>
+      <div class="card chart-card">
+        <h3>Monthly Conversion Funnel</h3>
+        <div class="chart-container">
+          <canvas id="funnelChart"></canvas>
+        </div>
+        <div style="margin-top: 20px; text-align: center; font-size: 13px; color: var(--text-secondary);">
+          <strong style="color: var(--primary-green);">Overall Conversion Rate:</strong> 0.2% from Awareness to Decision | 
+          <strong style="color: var(--primary-green);">Active Trading Rate:</strong> 60% of signups become active traders
+        </div>
+      </div>
+    </section>
+    
+    <!-- Go-to-Market Roadmap Section -->
+    <section class="section">
+      <h2 class="section-title">Go-to-Market Roadmap</h2>
+      <div class="roadmap-timeline" id="roadmapTimeline">
+        <!-- Roadmap phases will be dynamically generated -->
+      </div>
+    </section>
+    
+  </div>
+  
+  <script>
+    // Data
+    const personas = [
+      {
+        id: 1,
+        name: "Young Professional Trader",
+        age: "25-35",
+        share: "41.5%",
+        gender: "65% Male",
+        experience: "2-5 years",
+        trades: "10-20 trades/month",
+        avgTrade: "$500-$2,000",
+        portfolio: "$3k-$15k",
+        mobile: "85%",
+        hours: "6-11 PM Iran time",
+        assets: ["Stocks: 40%", "Forex: 35%", "Crypto: 25%"],
+        painPoints: ["Payment processing difficulties", "Platform filtering issues", "Need for Persian support"],
+        motivation: "Build wealth, hedge against inflation"
+      },
+      {
+        id: 2,
+        name: "Experienced Investor",
+        age: "35-50",
+        share: "15.6%",
+        gender: "80% Male",
+        experience: "5-10+ years",
+        trades: "15-30 trades/month",
+        avgTrade: "$2k-$10k",
+        portfolio: "$20k-$100k+",
+        mobile: "40%",
+        hours: "9AM-12PM, Evening",
+        assets: ["Stocks: 50%", "Commodities: 20%", "Forex: 20%", "Bonds: 10%"],
+        painPoints: ["Need advanced tools", "Security concerns", "Platform filtering"],
+        motivation: "Preserve wealth, professional portfolio management"
+      },
+      {
+        id: 3,
+        name: "Novice Retail Investor",
+        age: "21-30",
+        share: "35%",
+        gender: "55% Male",
+        experience: "0-2 years",
+        trades: "3-8 trades/month",
+        avgTrade: "$100-$500",
+        portfolio: "$500-$3k",
+        mobile: "95%",
+        hours: "Flexible all day",
+        assets: ["Crypto: 50%", "Stocks: 35%", "Forex: 15%"],
+        painPoints: ["Lack of education", "Complex interface", "Fear of risk"],
+        motivation: "Quick profits, learning, FOMO-driven"
+      },
+      {
+        id: 4,
+        name: "Institutional/Semi-Pro",
+        age: "30-45",
+        share: "7.9%",
+        gender: "85% Male",
+        experience: "8-15+ years",
+        trades: "30-100+ trades/month",
+        avgTrade: "$10k-$50k+",
+        portfolio: "$100k-$1M+",
+        mobile: "30%",
+        hours: "Full market hours",
+        assets: ["Multi-asset: All instruments"],
+        painPoints: ["Execution speed", "API access", "Capital security"],
+        motivation: "Professional income, global market access"
+      }
+    ];
+    
+    const decisionCriteria = [
+      { name: "Low Spreads & Commissions", score: 9.8 },
+      { name: "Deposit/Withdrawal Methods for Iran", score: 9.7 },
+      { name: "Platform Security & Regulation", score: 9.5 },
+      { name: "Broker Accessibility (No Filtering)", score: 9.4 },
+      { name: "Platform Reliability & Speed", score: 9.3 },
+      { name: "Persian Language Support", score: 9.2 },
+      { name: "Customer Support Responsiveness", score: 9.0 },
+      { name: "Mobile App Quality", score: 8.8 },
+      { name: "Range of Trading Instruments", score: 8.5 },
+      { name: "Islamic/Swap-Free Accounts", score: 8.5 },
+      { name: "Educational Resources in Farsi", score: 8.2 },
+      { name: "Account Types & Leverage Options", score: 8.0 },
+      { name: "Advanced Charting Tools", score: 7.8 },
+      { name: "Copy/Social Trading Features", score: 7.5 },
+      { name: "Demo Account Availability", score: 7.0 }
+    ];
+    
+    const challenges = [
+      { name: "Banking/Payment Restrictions", score: 9.5 },
+      { name: "Broker Filtering/Access Issues", score: 8.8 },
+      { name: "Capital Security Fears", score: 8.8 },
+      { name: "Platform Security Concerns", score: 8.5 },
+      { name: "Limited Financial Education", score: 8.2 },
+      { name: "Regulatory Uncertainty", score: 8.0 },
+      { name: "Lack of Persian Language Support", score: 7.5 },
+      { name: "High Trading Costs", score: 7.0 }
+    ];
+    
+    const opportunities = [
+      { name: "Integrated Payment Solutions", score: 9.8 },
+      { name: "No Broker Filtering", score: 9.4 },
+      { name: "Mobile-First Trading Platform", score: 9.2 },
+      { name: "Local Customer Support", score: 9.0 },
+      { name: "Multi-Asset Platform", score: 8.8 },
+      { name: "Persian Educational Content", score: 8.5 },
+      { name: "Crypto Integration", score: 8.5 },
+      { name: "Low-Cost Trading", score: 8.0 },
+      { name: "Social/Copy Trading Features", score: 7.8 },
+      { name: "Islamic Accounts", score: 7.5 }
+    ];
+    
+    // Initialize Dashboard
+    function initDashboard() {
+      renderPersonas();
+      renderCriteria();
+      renderChallengesAndOpportunities();
+      renderKPITimeline();
+      renderRoadmap();
+      createCharts();
+    }
+    
+    // Render Personas
+    function renderPersonas() {
+      const grid = document.getElementById('personasGrid');
+      personas.forEach(persona => {
+        const card = document.createElement('div');
+        card.className = 'card persona-card';
+        card.onclick = () => togglePersona(card);
+        
+        card.innerHTML = `
+          <div class="persona-header">
+            <div class="persona-name">${persona.name}</div>
+            <div class="persona-share">${persona.share}</div>
+          </div>
+          <div class="persona-basic">
+            <div class="persona-stat"><strong>Age:</strong> ${persona.age}</div>
+            <div class="persona-stat"><strong>Gender:</strong> ${persona.gender}</div>
+            <div class="persona-stat"><strong>Experience:</strong> ${persona.experience}</div>
+            <div class="persona-stat"><strong>Trades:</strong> ${persona.trades}</div>
+            <div class="persona-stat"><strong>Avg Trade:</strong> ${persona.avgTrade}</div>
+            <div class="persona-stat"><strong>Portfolio:</strong> ${persona.portfolio}</div>
+            <div class="persona-stat"><strong>Mobile:</strong> ${persona.mobile}</div>
+            <div class="persona-stat"><strong>Peak Hours:</strong> ${persona.hours}</div>
+          </div>
+          <div class="expand-indicator">▼ Click to expand details</div>
+          <div class="persona-details">
+            <div class="persona-section">
+              <div class="persona-section-title">Preferred Assets</div>
+              <ul class="persona-list">
+                ${persona.assets.map(asset => `<li>${asset}</li>`).join('')}
+              </ul>
+            </div>
+            <div class="persona-section">
+              <div class="persona-section-title">Key Pain Points</div>
+              <ul class="persona-list">
+                ${persona.painPoints.map(point => `<li>${point}</li>`).join('')}
+              </ul>
+            </div>
+            <div class="persona-section">
+              <div class="persona-section-title">Motivation</div>
+              <p style="font-size: 12px; color: var(--text-secondary);">${persona.motivation}</p>
+            </div>
+          </div>
+        `;
+        
+        grid.appendChild(card);
+      });
+    }
+    
+    function togglePersona(card) {
+      card.classList.toggle('expanded');
+      const indicator = card.querySelector('.expand-indicator');
+      if (card.classList.contains('expanded')) {
+        indicator.textContent = '▲ Click to collapse';
+      } else {
+        indicator.textContent = '▼ Click to expand details';
+      }
+    }
+    
+    // Render Decision Criteria
+    function renderCriteria() {
+      const list = document.getElementById('criteriaList');
+      decisionCriteria.forEach(criteria => {
+        const item = document.createElement('div');
+        item.className = 'criteria-item';
+        
+        let className = 'low';
+        if (criteria.score >= 9.5) className = 'critical';
+        else if (criteria.score >= 8.5) className = 'high';
+        else if (criteria.score >= 8.0) className = 'medium';
+        
+        const percentage = (criteria.score / 10) * 100;
+        
+        item.innerHTML = `
+          <div class="criteria-label">${criteria.name}</div>
+          <div class="criteria-bar">
+            <div class="criteria-fill ${className}" style="width: ${percentage}%">
+              <span class="criteria-score">${criteria.score}/10</span>
+            </div>
+          </div>
+        `;
+        
+        list.appendChild(item);
+      });
+    }
+    
+    // Render Challenges and Opportunities
+    function renderChallengesAndOpportunities() {
+      const challengesList = document.getElementById('challengesList');
+      challenges.forEach(challenge => {
+        const item = document.createElement('div');
+        item.className = 'challenge-item';
+        
+        let badgeClass = 'severity-medium';
+        if (challenge.score >= 9.0) badgeClass = 'severity-critical';
+        else if (challenge.score >= 8.0) badgeClass = 'severity-high';
+        
+        item.innerHTML = `
+          <span>${challenge.name}</span>
+          <span class="severity-badge ${badgeClass}">${challenge.score}/10</span>
+        `;
+        
+        challengesList.appendChild(item);
+      });
+      
+      const opportunitiesList = document.getElementById('opportunitiesList');
+      opportunities.forEach(opportunity => {
+        const item = document.createElement('div');
+        item.className = 'opportunity-item';
+        
+        let badgeClass = 'gap-medium';
+        if (opportunity.score >= 9.0) badgeClass = 'gap-critical';
+        else if (opportunity.score >= 8.0) badgeClass = 'gap-high';
+        
+        item.innerHTML = `
+          <span>${opportunity.name}</span>
+          <span class="gap-badge ${badgeClass}">${opportunity.score}/10</span>
+        `;
+        
+        opportunitiesList.appendChild(item);
+      });
+    }
+    
+    // Render KPI Timeline
+    function renderKPITimeline() {
+      const timeline = document.getElementById('kpiTimeline');
+      const kpis = [
+        {
+          month: "Month 0",
+          data: [
+            { label: "Registrations", value: "5,000" },
+            { label: "Funded Accounts", value: "1,000" },
+            { label: "Monthly Volume", value: "$500K" }
+          ]
+        },
+        {
+          month: "Month 3",
+          data: [
+            { label: "Registrations", value: "25,000" },
+            { label: "Active Traders", value: "7,000" },
+            { label: "Monthly Volume", value: "$5M" }
+          ]
+        },
+        {
+          month: "Month 6",
+          data: [
+            { label: "Registrations", value: "75,000" },
+            { label: "Active Traders", value: "20,000" },
+            { label: "Monthly Volume", value: "$25M" }
+          ]
+        },
+        {
+          month: "Month 12",
+          data: [
+            { label: "Registrations", value: "150,000" },
+            { label: "Active Traders", value: "40,000" },
+            { label: "Monthly Volume", value: "$60M" }
+          ]
+        }
+      ];
+      
+      kpis.forEach(kpi => {
+        const card = document.createElement('div');
+        card.className = 'kpi-milestone';
+        
+        card.innerHTML = `
+          <div class="kpi-month">${kpi.month}</div>
+          <div class="kpi-metrics">
+            ${kpi.data.map(metric => `
+              <div class="kpi-metric">
+                <strong>${metric.value}</strong>
+                ${metric.label}
+              </div>
+            `).join('')}
+          </div>
+        `;
+        
+        timeline.appendChild(card);
+      });
+    }
+    
+    // Render Roadmap
+    function renderRoadmap() {
+      const roadmap = document.getElementById('roadmapTimeline');
+      const phases = [
+        {
+          name: "Pre-Launch (Months -3 to 0)",
+          items: ["Product Development", "Beta Testing", "Marketing Setup", "Team Hiring"]
+        },
+        {
+          name: "Launch (Month 0)",
+          items: ["Official Platform Launch", "Virtual Launch Event", "Launch Promotions", "Marketing Campaign Activation"]
+        },
+        {
+          name: "Growth (Months 1-3)",
+          items: ["Marketing Scale", "Product Enhancements", "Community Building", "Content Marketing"]
+        },
+        {
+          name: "Expansion (Months 4-12)",
+          items: ["Copy Trading Launch", "Advanced Features", "Market Expansion", "Brand Leadership"]
+        }
+      ];
+      
+      phases.forEach(phase => {
+        const card = document.createElement('div');
+        card.className = 'roadmap-phase';
+        
+        card.innerHTML = `
+          <h4>${phase.name}</h4>
+          <ul>
+            ${phase.items.map(item => `<li>${item}</li>`).join('')}
+          </ul>
+        `;
+        
+        roadmap.appendChild(card);
+      });
+    }
+    
+    // Create Charts
+    function createCharts() {
+      const chartColors = ['#00A96E', '#FFC185', '#B4413C', '#ECEBD5', '#5D878F', '#DB4545', '#D2BA4C', '#964325', '#944454', '#13343B'];
+      
+      // Influence Factors Chart
+      new Chart(document.getElementById('influenceChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Political Factors', 'Psychological Factors', 'Expected Returns', 'Economic Factors', 'Internal Factors'],
+          datasets: [{
+            label: 'Influence %',
+            data: [79, 64, 49, 47, 31],
+            backgroundColor: chartColors[0],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+              max: 100,
+              ticks: { callback: value => value + '%' }
+            }
+          }
+        }
+      });
+      
+      // Portfolio Distribution Chart
+      new Chart(document.getElementById('portfolioChart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Less than 3 stocks', '3-5 stocks', '5-9 stocks', 'More than 10 stocks'],
+          datasets: [{
+            data: [10, 20, 30, 40],
+            backgroundColor: [chartColors[0], chartColors[1], chartColors[2], chartColors[4]]
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+      
+      // Holding Period Chart
+      new Chart(document.getElementById('holdingChart'), {
+        type: 'pie',
+        data: {
+          labels: ['Less than 2 months', '2-6 months', '6-15 months', 'More than 15 months'],
+          datasets: [{
+            data: [20, 40, 25, 15],
+            backgroundColor: [chartColors[0], chartColors[1], chartColors[4], chartColors[6]]
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+      
+      // Investor Type Chart
+      new Chart(document.getElementById('investorTypeChart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Retail Trading Value', 'Institutional Trading Value'],
+          datasets: [{
+            data: [28.89, 71.11],
+            backgroundColor: [chartColors[1], chartColors[0]]
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return context.label + ': ' + context.parsed + '%';
+                }
+              }
+            }
+          }
+        }
+      });
+      
+      // Instruments Chart
+      new Chart(document.getElementById('instrumentsChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Stocks/Equities', 'Forex', 'Cryptocurrencies', 'Commodities', 'ETFs', 'Derivatives/Futures'],
+          datasets: [{
+            label: 'Market Share %',
+            data: [45, 25, 15, 8, 4, 3],
+            backgroundColor: chartColors[0],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 50,
+              ticks: { callback: value => value + '%' }
+            }
+          }
+        }
+      });
+      
+      // Fintech Growth Chart
+      new Chart(document.getElementById('fintechGrowthChart'), {
+        type: 'line',
+        data: {
+          labels: ['2024', '2025', '2026', '2027', '2028', '2029', '2030', '2031', '2032', '2033'],
+          datasets: [{
+            label: 'Market Size (Million USD)',
+            data: [716.66, 830, 961, 1113, 1289, 1493, 1729, 2003, 2320, 2687.62],
+            borderColor: chartColors[0],
+            backgroundColor: 'rgba(0, 169, 110, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 5,
+            pointBackgroundColor: chartColors[0]
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: true, position: 'top' },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return 'Market Size: $' + context.parsed.y.toFixed(2) + 'M';
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: value => '$' + value + 'M'
+              }
+            }
+          }
+        }
+      });
+      
+      // Marketing Budget Chart
+      new Chart(document.getElementById('marketingChart'), {
+        type: 'pie',
+        data: {
+          labels: ['Telegram', 'Paid Advertising', 'Instagram/Social Media', 'YouTube/Content Marketing', 'Other Channels'],
+          datasets: [{
+            data: [35, 30, 20, 10, 5],
+            backgroundColor: [chartColors[0], chartColors[1], chartColors[4], chartColors[6], chartColors[3]]
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return context.label + ': ' + context.parsed + '%';
+                }
+              }
+            }
+          }
+        }
+      });
+      
+      // Funnel Chart
+      new Chart(document.getElementById('funnelChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Awareness (Monthly)', 'Consideration (Leads)', 'Decision (Signups)', 'Active Trading'],
+          datasets: [{
+            label: 'Users',
+            data: [500000, 5000, 1000, 600],
+            backgroundColor: [chartColors[0], chartColors[1], chartColors[4], chartColors[6]],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return 'Users: ' + context.parsed.y.toLocaleString();
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              type: 'logarithmic',
+              beginAtZero: false,
+              ticks: {
+                callback: value => value.toLocaleString()
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    // Export functionality
+    function exportDashboard() {
+      alert('Export functionality: This would generate a PDF or Excel report with all dashboard data. Implementation requires backend integration.');
+    }
+    
+    // Filter handlers
+    document.addEventListener('DOMContentLoaded', function() {
+      initDashboard();
+      
+      document.getElementById('dateFilter').addEventListener('change', function(e) {
+        console.log('Date filter changed:', e.target.value);
+      });
+      
+      document.getElementById('personaFilter').addEventListener('change', function(e) {
+        console.log('Persona filter changed:', e.target.value);
+        // In a real implementation, this would filter the data displayed
+      });
+      
+      document.getElementById('viewMode').addEventListener('change', function(e) {
+        console.log('View mode changed:', e.target.value);
+      });
+    });
+  </script>
+  
+</body>
+</html>
