@@ -461,44 +461,83 @@
       font-size: var(--font-size-xs);
     }
     
-    .insights-panel {
-      background: var(--color-bg-1);
-      padding: var(--space-20);
-      border-radius: var(--radius-lg);
-      border-left: 4px solid var(--color-primary);
-    }
-    
-    .insight-section {
-      margin-bottom: var(--space-20);
-    }
-    
-    .insight-title {
-      font-size: var(--font-size-lg);
-      font-weight: var(--font-weight-semibold);
-      color: var(--color-text);
-      margin-bottom: var(--space-12);
-    }
-    
-    .insight-list {
-      list-style: none;
-    }
-    
-    .insight-list li {
-      padding: var(--space-8) 0;
-      padding-left: var(--space-20);
-      position: relative;
-      font-size: var(--font-size-sm);
-      line-height: 1.6;
-    }
-    
-    .insight-list li:before {
-      content: "•";
-      position: absolute;
-      left: 0;
-      color: var(--color-primary);
-      font-weight: bold;
-      font-size: var(--font-size-lg);
-    }
+/* --- Insights Horizontal Grid Layout --- */
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: var(--space-24);
+  margin-top: var(--space-16);
+}
+
+/* Each insight section becomes a card */
+.insight-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-20);
+  transition: transform var(--duration-normal) var(--ease-standard), box-shadow var(--duration-normal) var(--ease-standard);
+}
+
+.insight-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Title style */
+.insight-card .insight-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-12);
+  color: var(--color-text);
+}
+
+/* List style */
+.insight-card .insight-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.insight-card .insight-list li {
+  padding-left: var(--space-16);
+  margin-bottom: var(--space-12);
+  line-height: 1.6;
+  font-size: var(--font-size-sm);
+  position: relative;
+}
+
+.insight-card .insight-list li:before {
+  content: "•";
+  color: var(--color-primary);
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+/* Summary/imperative box */
+.insight-summary {
+  margin-top: var(--space-16);
+  padding: var(--space-12);
+  background: var(--color-bg-2);
+  border-radius: var(--radius-base);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
+/* Responsive stacking */
+@media (max-width: 1024px) {
+  .insights-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .insights-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
     
     .gap-indicator {
       color: var(--wingo-red);
@@ -761,104 +800,85 @@
     <!-- Strategic Insights Section -->
 <section class="section">
   <h2 class="section-title">Strategic Insights &amp; Key Takeaways</h2>
-  <div class="insights-panel">
-    
-    <!-- 1️⃣ BIGGEST GAPS TO CLOSE -->
-    <div class="insight-section">
-      <h3 class="insight-title">1️⃣ BIGGEST GAPS TO CLOSE — “From Trust Deficit to Credibility”</h3>
-      <ul class="insight-list">
-        <li>
-          <strong>Regulation &amp; Trust</strong><br>
-          Wingo’s growth ceiling is limited by regulatory perception.<br>
-          Immediate priority: secure an internationally recognized license (e.g., CySEC) and publish transparent compliance reports.<br>
-          Establish an in-house compliance and audit function to signal reliability to professional and institutional traders.
-        </li>
-        <li>
-          <strong>Payment Infrastructure</strong><br>
-          Current payment flow restricts Iranian user onboarding.<br>
-          Strategic fix: integrate with major local gateways (e.g., Nobitex, Wallex) for seamless Rial deposits and withdrawals.<br>
-          Reinforce user trust through instant transaction confirmations and guaranteed SLAs.
-        </li>
-        <li>
-          <strong>Customer Support &amp; Retention</strong><br>
-          Service responsiveness is strong but lacks premium depth.<br>
-          Introduce 24/7 Persian-language live chat, voice support, and dedicated account managers for VIP clients.<br>
-          Aim to convert customer satisfaction into long-term loyalty.
-        </li>
-        <li>
-          <strong>Execution &amp; Performance Consistency</strong><br>
-          Traders value predictable order execution and withdrawal transparency.<br>
-          Formalize a 48-hour withdrawal commitment and arbitration system to eliminate reliability concerns.
-        </li>
-      </ul>
-    </div>
+<div class="insights-grid">
 
-    <!-- 2️⃣ BIGGEST OPPORTUNITIES -->
-    <div class="insight-section">
-      <h3 class="insight-title">2️⃣ BIGGEST OPPORTUNITIES — “From Functional to Exceptional”</h3>
-      <ul class="insight-list">
-        <li>
-          <strong>Innovation &amp; Charting Leadership</strong><br>
-          The market lacks a broker combining advanced charting tools and social features.<br>
-          Introducing cTrader and TradingView integration positions Wingo uniquely in that “white space” of innovation.
-        </li>
-        <li>
-          <strong>Mobile Experience Excellence</strong><br>
-          Competitors underinvest in mobile usability and trader engagement.<br>
-          A proprietary app with integrated social trading, analytics, and gamified leaderboards can define Wingo’s competitive edge.
-        </li>
-        <li>
-          <strong>Trading Depth &amp; Leverage Flexibility</strong><br>
-          Expanding product diversity (Cent accounts, higher leverage options, and local bonus structures) will unlock a wider trader base.<br>
-          Opportunity to serve both beginner and professional segments under a single, unified platform.
-        </li>
-        <li>
-          <strong>Social Trading Leadership</strong><br>
-          Wingo already leads in social engagement; the priority now is to scale.<br>
-          Add AI-powered signal matching, verified provider rankings, and reward-driven community engagement to sustain dominance.
-        </li>
-      </ul>
-    </div>
-
-    <!-- 3️⃣ MARKET FRAGMENTATION INSIGHTS -->
-    <div class="insight-section">
-      <h3 class="insight-title">3️⃣ MARKET FRAGMENTATION INSIGHTS — “Opportunity in the Gaps”</h3>
-      <ul class="insight-list">
-        <li>No single broker in the Persian-speaking market achieves excellence across multiple dimensions; strength is isolated.</li>
-        <li>Wingo is the only player leading in Social Trading, creating a clear brand differentiator.</li>
-        <li>Major “white spaces” exist in Trust &amp; Regulation, Advanced Charting, and Integrated Support Ecosystems.</li>
-        <li>The market remains fragmented — Wingo can capture share by offering a complete, end-to-end trader experience rather than isolated strengths.</li>
-      </ul>
-    </div>
-
-    <!-- 4️⃣ PERSONA INSIGHTS -->
-    <div class="insight-section">
-      <h3 class="insight-title">4️⃣ PERSONA INSIGHTS — “Segmented Growth Leverage”</h3>
-      <ul class="insight-list">
-        <li>
-          <strong>Novice Traders (≈35% of market)</strong><br>
-          Seek simplicity, education, and social engagement.<br>
-          Wingo’s strongest appeal segment — should reinforce through Academy, demo challenges, and community learning.
-        </li>
-        <li>
-          <strong>Professional Traders (≈23.5% of market)</strong><br>
-          Prioritize regulation, execution speed, and product depth.<br>
-          Currently underpenetrated due to limited regulatory visibility — Phase 1 licensing will unlock this high-value audience.
-        </li>
-        <li>
-          <strong>Institutional/Experienced Segment (≈8% of market)</strong><br>
-          Hesitant due to trust deficit; represents over $200M potential volume.<br>
-          A compliance-first transformation (Phase 1–2) directly enables entry into this segment.
-        </li>
-      </ul>
-      <div style="margin-top: var(--space-16); padding: var(--space-12); background: var(--color-bg-4); border-radius: var(--radius-sm); font-size: var(--font-size-sm);">
-        <strong>Strategic Imperative:</strong><br>
-        Wingo stands at the intersection of trust restoration and innovation leadership.<br>
-        By combining regulatory credibility with product innovation and community-driven engagement, Wingo can transition from a credible alternative to a regional benchmark broker over the next 36 months.
-      </div>
-    </div>
-
+  <!-- 1️⃣ -->
+  <div class="insight-card">
+    <h3 class="insight-title">1️⃣ BIGGEST GAPS TO CLOSE — “From Trust Deficit to Credibility”</h3>
+    <ul class="insight-list">
+      <li><strong>Regulation &amp; Trust</strong><br>
+        Wingo’s growth ceiling is limited by regulatory perception.<br>
+        Immediate priority: secure an internationally recognized license (e.g., CySEC) and publish transparent compliance reports.<br>
+        Establish an in-house compliance and audit function to signal reliability to professional and institutional traders.
+      </li>
+      <li><strong>Payment Infrastructure</strong><br>
+        Current payment flow restricts Iranian user onboarding.<br>
+        Integrate with major local gateways (e.g., Nobitex, Wallex) for seamless Rial deposits and withdrawals.<br>
+        Reinforce user trust through instant transaction confirmations and guaranteed SLAs.
+      </li>
+      <li><strong>Customer Support &amp; Retention</strong><br>
+        Introduce 24/7 Persian-language live chat, voice support, and dedicated account managers for VIP clients.<br>
+        Aim to convert customer satisfaction into long-term loyalty.
+      </li>
+      <li><strong>Execution &amp; Performance Consistency</strong><br>
+        Formalize a 48-hour withdrawal commitment and arbitration system to eliminate reliability concerns.
+      </li>
+    </ul>
   </div>
+
+  <!-- 2️⃣ -->
+  <div class="insight-card">
+    <h3 class="insight-title">2️⃣ BIGGEST OPPORTUNITIES — “From Functional to Exceptional”</h3>
+    <ul class="insight-list">
+      <li><strong>Innovation &amp; Charting Leadership</strong><br>
+        Introducing cTrader and TradingView integration positions Wingo uniquely in that “white space” of innovation.
+      </li>
+      <li><strong>Mobile Experience Excellence</strong><br>
+        A proprietary app with integrated social trading, analytics, and gamified leaderboards can define Wingo’s competitive edge.
+      </li>
+      <li><strong>Trading Depth &amp; Leverage Flexibility</strong><br>
+        Expanding product diversity (Cent accounts, higher leverage options, and local bonus structures) will unlock a wider trader base.
+      </li>
+      <li><strong>Social Trading Leadership</strong><br>
+        Add AI-powered signal matching, verified provider rankings, and reward-driven community engagement to sustain dominance.
+      </li>
+    </ul>
+  </div>
+
+  <!-- 3️⃣ -->
+  <div class="insight-card">
+    <h3 class="insight-title">3️⃣ MARKET FRAGMENTATION INSIGHTS — “Opportunity in the Gaps”</h3>
+    <ul class="insight-list">
+      <li>No single broker in the Persian-speaking market achieves excellence across multiple dimensions.</li>
+      <li>Wingo is the only player leading in Social Trading — a clear brand differentiator.</li>
+      <li>Major “white spaces” exist in Trust &amp; Regulation, Advanced Charting, and Integrated Support Ecosystems.</li>
+      <li>The market remains fragmented — Wingo can win by offering a complete, end-to-end trader experience.</li>
+    </ul>
+  </div>
+
+  <!-- 4️⃣ -->
+  <div class="insight-card">
+    <h3 class="insight-title">4️⃣ PERSONA INSIGHTS — “Segmented Growth Leverage”</h3>
+    <ul class="insight-list">
+      <li><strong>Novice Traders (≈35%)</strong><br>
+        Seek simplicity, education, and social engagement — reinforce through Academy and community learning.
+      </li>
+      <li><strong>Professional Traders (≈23.5%)</strong><br>
+        Prioritize regulation and execution — Phase 1 licensing unlocks this segment.
+      </li>
+      <li><strong>Institutional Segment (≈8%)</strong><br>
+        Trust deficit limits entry; compliance-first evolution enables penetration.
+      </li>
+    </ul>
+    <div class="insight-summary">
+      <strong>Strategic Imperative:</strong><br>
+      Wingo stands at the intersection of trust restoration and innovation leadership.<br>
+      Combining regulatory credibility with product innovation will elevate it to a regional benchmark within 36 months.
+    </div>
+  </div>
+
+</div>
+
 </section>
 
   
